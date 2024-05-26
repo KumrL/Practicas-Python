@@ -4,6 +4,7 @@ class main_window():
     def __init__(self, window):
         self.window = window
         window.geometry("350x500")
+        window.resizable(0, 0)
         self.draw()
 
     def draw(self):
