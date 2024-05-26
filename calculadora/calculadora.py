@@ -93,5 +93,3 @@ class main_window():
 
 start_window = main_window(ctk.CTk())
 start_window.window.mainloop()
-
-#Kumar López
