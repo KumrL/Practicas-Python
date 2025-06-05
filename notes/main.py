@@ -17,8 +17,20 @@ class main(CTk):
         self.left_frame = CTkFrame(self, corner_radius= 0)
         self.left_frame.place(relx= 0, rely= 0, relwidth= 0.3, relheight= 1)
 
+        def searching(event, keys):
+            for x in self.notes_list:
+                x.pack_forget()
+            resultado = list()
+            keys = keys.lower()
+            for x in self.notes_list:
+                if keys in x.cget("text").lower():
+                    resultado.append(x)
+            for x in resultado:
+                x.pack(pady= (0, 5), fill= X, padx= 5)
+
         self.search= CTkEntry(self.left_frame, placeholder_text= "Search")
         self.search.pack(side= TOP, fill= X, padx= 10, pady= (10, 0))
+        self.search.bind("<KeyRelease>", lambda event: searching(event, self.search.get()))
         
         self.btns_frame = CTkFrame(self.left_frame, fg_color= "transparent")
         self.btns_frame.pack(side= TOP, fill= X, padx= 10, pady= (10, 0))
@@ -33,10 +45,8 @@ class main(CTk):
             for x in self.notes_list:
                 x.destroy()
             self.notes_list.clear()
-            for x in self.db.get_notes():
-                note_btn = CTkButton(self.scroll_frame, text= x[1], command= lambda x=x: [self.note_id_control.set(x[0]), insert_text(x[0])], font= ("Arial", 13, "bold"), fg_color= "#005f76", hover_color= "#00485a")
-                note_btn.pack(pady= (0, 5), fill= X, padx= 5)
-                self.notes_list.append(note_btn)
+            self.active_note_btn = None
+            draw_btn_notes()
             self.note_id_control.set(0)
             self.text_container.delete(1.0, END)
         img_create = CTkImage(Image.open("assets/create.png"), size= (25, 25))
@@ -48,10 +58,8 @@ class main(CTk):
             for x in self.notes_list:
                 x.destroy()
             self.notes_list.clear()
-            for x in self.db.get_notes():
-                note_btn = CTkButton(self.scroll_frame, text= x[1], command= lambda x=x: [self.note_id_control.set(x[0]), insert_text(x[0])], font= ("Arial", 13, "bold"), fg_color= "#005f76", hover_color= "#00485a")
-                note_btn.pack(pady= (0, 5), fill= X, padx= 5)
-                self.notes_list.append(note_btn)
+            self.active_note_btn = None
+            draw_btn_notes()
             self.note_id_control.set(0)
             self.text_container.delete(1.0, END)
         img_delete = CTkImage(Image.open("assets/delete.png"), size= (25, 25))
@@ -68,11 +76,24 @@ class main(CTk):
         
         self.note_id_control = IntVar()
         self.notes_list = list()
-
-        for x in self.db.get_notes():
-            note_btn = CTkButton(self.scroll_frame, text= x[1], command= lambda x=x: [self.note_id_control.set(x[0]), insert_text(x[0])], font= ("Arial", 13, "bold"), fg_color= "#005f76", hover_color= "#00485a")
-            note_btn.pack(pady= (0, 5), fill= X, padx= 5)
-            self.notes_list.append(note_btn)
+        self.active_note_btn = None
+        
+        def disble_note(btn):
+            if self.active_note_btn == None:
+                self.active_note_btn = btn
+                self.active_note_btn.configure(state= "disabled")
+            elif self.active_note_btn != btn:
+                self.active_note_btn.configure(state= "normal")
+                self.active_note_btn = btn
+                self.active_note_btn.configure(state= "disabled")
+            
+        def draw_btn_notes():
+            for x in self.db.get_notes():
+                note_btn = CTkButton(self.scroll_frame, text= x[1], font= ("Arial", 13, "bold"), fg_color= "#005f76", hover_color= "#00485a")
+                note_btn.configure(command= lambda x=x, b= note_btn: [self.note_id_control.set(x[0]), insert_text(x[0]), disble_note(b)])
+                note_btn.pack(pady= (0, 5), fill= X, padx= 5)
+                self.notes_list.append(note_btn)
+        draw_btn_notes()
 
 
     def right_section(self):
@@ -98,10 +119,10 @@ class createNoteWindow(CTkToplevel):
 
         def counter(event):
             text = self.name.get()
-            if len(text) > 75:
+            if len(text) > 30:
                 self.name.delete(0, END)
                 self.name.insert(0, text[:75])
-        self.name = CTkEntry(self, placeholder_text= "Max. 75")
+        self.name = CTkEntry(self, placeholder_text= "Max. 30")
         self.name.place(relx= 0.1, rely=0.2, relwidth= 0.8, relheight= 0.2)
         self.name.bind("<KeyRelease>", counter)
 
