@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/index.css">
+    <title>Background Remover</title>
+</head>
+<body>
+
+    <header>
+        <h1>Welcome to the Background Remover</h1>
+    </header>
+
+    <div class="container_form">
+        <form action="/" method="post" enctype="multipart/form-data">
+            <input type="file" name="image" accept="image/*" required>
+            <button type="submit">SUBMIT</button>
+        </form>
+    </div>
+
+    {% if image %}
+        <div class="images_container">
+            <img src="{{ url_for('static', filename='/uploads/'+image) }}" alt="Original">
+            <img src="{{ url_for('static', filename='/processed/'+image) }}" alt="New">
+        </div>
+
+        <div class="download_section">
+            <a href="{{ url_for('download', filename=image) }}"><Button>Download</Button></a>
+        </div>
+
+    {% endif %}
+
+</body>
+</html>
